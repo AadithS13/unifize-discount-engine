@@ -1,8 +1,6 @@
 package discounts
 
 import (
-	"strings"
-
 	"github.com/shopspring/decimal"
 
 	"github.com/aadiths/unifize-discount-engine/internal/models"
@@ -23,7 +21,7 @@ func (c CategoryDiscount) Apply(
 
 	for _, item := range items {
 
-		if strings.EqualFold(item.Product.Category, "T-shirts") {
+		if item.Product.Category == models.CategoryTShirts {
 
 			itemTotal := item.Product.BasePrice.
 				Mul(decimal.NewFromInt(int64(item.Quantity)))

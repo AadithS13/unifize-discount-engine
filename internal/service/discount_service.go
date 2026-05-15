@@ -23,9 +23,23 @@ func (s *DiscountService) CalculateCartDiscounts(
 	voucherCode *string,
 ) (*models.DiscountedPrice, error) {
 
+	// VALIDATION
+
+	for _, item := range cartItems {
+
+		if err := models.ValidateProduct(item.Product); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := models.ValidateCustomer(customer); err != nil {
+		return nil, err
+	}
+
+	// ORIGINAL TOTAL
+
 	total := decimal.Zero
 
-	// calculate original cart total
 	for _, item := range cartItems {
 
 		itemTotal := item.Product.BasePrice.
@@ -38,13 +52,15 @@ func (s *DiscountService) CalculateCartDiscounts(
 
 	applied := map[string]decimal.Decimal{}
 
-	// base rules
+	// BASE RULES
+
 	rules := []discounts.DiscountRule{
 		discounts.BrandDiscount{},
 		discounts.CategoryDiscount{},
 	}
 
-	// voucher validation + application
+	// VOUCHER
+
 	if voucherCode != nil {
 
 		valid, err := s.ValidateDiscountCode(
@@ -65,7 +81,8 @@ func (s *DiscountService) CalculateCartDiscounts(
 		}
 	}
 
-	// bank discount always last
+	// BANK OFFER
+
 	rules = append(
 		rules,
 		discounts.BankDiscount{
@@ -73,7 +90,8 @@ func (s *DiscountService) CalculateCartDiscounts(
 		},
 	)
 
-	// apply rules sequentially
+	// APPLY RULES
+
 	for _, rule := range rules {
 
 		newTotal, discount := rule.Apply(cartItems, total)
@@ -82,6 +100,8 @@ func (s *DiscountService) CalculateCartDiscounts(
 
 		total = newTotal
 	}
+
+	// RESPONSE
 
 	return &models.DiscountedPrice{
 		OriginalPrice:    original,

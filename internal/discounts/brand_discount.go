@@ -1,10 +1,9 @@
 package discounts
 
 import (
-	"strings"
+	"github.com/shopspring/decimal"
 
 	"github.com/aadiths/unifize-discount-engine/internal/models"
-	"github.com/shopspring/decimal"
 )
 
 type BrandDiscount struct{}
@@ -22,7 +21,7 @@ func (b BrandDiscount) Apply(
 
 	for _, item := range items {
 
-		if strings.EqualFold(item.Product.Brand, "PUMA") {
+		if item.Product.Brand == models.BrandPuma {
 
 			itemTotal := item.Product.BasePrice.
 				Mul(decimal.NewFromInt(int64(item.Quantity)))

@@ -10,8 +10,8 @@ func PumaTshirtCart() []models.CartItem {
 
 	product := models.Product{
 		ID:        "p1",
-		Brand:     "PUMA",
-		Category:  "T-shirts",
+		Brand:     models.BrandPuma,
+		Category:  models.CategoryTShirts,
 		BasePrice: decimal.NewFromInt(1000),
 	}
 

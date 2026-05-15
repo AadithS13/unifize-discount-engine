@@ -2,8 +2,7 @@ package service
 
 import (
 	"context"
-	"errors"
-	"strings"
+	"fmt"
 
 	"github.com/aadiths/unifize-discount-engine/internal/models"
 )
@@ -15,20 +14,25 @@ func (s *DiscountService) ValidateDiscountCode(
 	customer models.CustomerProfile,
 ) (bool, error) {
 
-	if !strings.EqualFold(code, "SUPER69") {
-		return false, errors.New("invalid voucher code")
+	// validate voucher
+	if code != string(models.VoucherSuper69) {
+		return false, fmt.Errorf("voucher %s is invalid", code)
 	}
 
 	// premium-only voucher
-	if customer.Tier != "PREMIUM" {
-		return false, errors.New("voucher allowed only for premium customers")
+	if customer.Tier != models.CustomerTierPremium {
+		return false, fmt.Errorf(
+			"voucher allowed only for premium customers",
+		)
 	}
 
-	// exclude PUMA
+	// example brand exclusion rule
 	for _, item := range cartItems {
 
-		if strings.EqualFold(item.Product.Brand, "PUMA") {
-			return false, errors.New("voucher not applicable on PUMA products")
+		if item.Product.Brand == models.BrandPuma {
+			return false, fmt.Errorf(
+				"voucher not applicable on PUMA products",
+			)
 		}
 	}
 
