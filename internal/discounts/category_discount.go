@@ -1,8 +1,10 @@
 package discounts
 
 import (
+	"strings"
 
 	"github.com/shopspring/decimal"
+
 	"github.com/aadiths/unifize-discount-engine/internal/models"
 )
 
@@ -17,7 +19,20 @@ func (c CategoryDiscount) Apply(
 	current decimal.Decimal,
 ) (decimal.Decimal, decimal.Decimal) {
 
-	discount := current.Mul(decimal.NewFromFloat(0.10))
+	discount := decimal.Zero
+
+	for _, item := range items {
+
+		if strings.EqualFold(item.Product.Category, "T-shirts") {
+
+			itemTotal := item.Product.BasePrice.
+				Mul(decimal.NewFromInt(int64(item.Quantity)))
+
+			itemDiscount := itemTotal.Mul(decimal.NewFromFloat(0.10))
+
+			discount = discount.Add(itemDiscount)
+		}
+	}
 
 	final := current.Sub(discount)
 

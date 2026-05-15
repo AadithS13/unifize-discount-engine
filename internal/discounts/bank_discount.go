@@ -3,8 +3,8 @@ package discounts
 import (
 	"strings"
 
-	"github.com/shopspring/decimal"
 	"github.com/aadiths/unifize-discount-engine/internal/models"
+	"github.com/shopspring/decimal"
 )
 
 type BankDiscount struct {

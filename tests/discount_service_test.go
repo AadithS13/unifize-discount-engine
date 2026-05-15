@@ -26,14 +26,14 @@ func TestDiscountCalculation(t *testing.T) {
 			Method:   "CARD",
 			BankName: &bank,
 		},
-		nil, 
+		nil,
 	)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := "486"
+	expected := "450"
 
 	if res.FinalPrice.StringFixed(0) != expected {
 		t.Fatalf(
@@ -64,5 +64,52 @@ func TestVoucherValidation(t *testing.T) {
 
 	if err == nil {
 		t.Fatal("expected validation error")
+	}
+}
+
+func TestValidateDiscountCode(t *testing.T) {
+
+	tests := []struct {
+		name        string
+		customer    models.CustomerProfile
+		expectValid bool
+	}{
+		{
+			name: "premium customer",
+			customer: models.CustomerProfile{
+				ID:   "c1",
+				Tier: "PREMIUM",
+			},
+			expectValid: false, // PUMA excluded
+		},
+		{
+			name: "regular customer",
+			customer: models.CustomerProfile{
+				ID:   "c2",
+				Tier: "REGULAR",
+			},
+			expectValid: false,
+		},
+	}
+
+	svc := service.NewDiscountService()
+
+	for _, tt := range tests {
+
+		valid, _ := svc.ValidateDiscountCode(
+			context.Background(),
+			"SUPER69",
+			testdata.PumaTshirtCart(),
+			tt.customer,
+		)
+
+		if valid != tt.expectValid {
+			t.Fatalf(
+				"%s expected %v got %v",
+				tt.name,
+				tt.expectValid,
+				valid,
+			)
+		}
 	}
 }
