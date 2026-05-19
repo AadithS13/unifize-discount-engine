@@ -43,9 +43,9 @@ unifize-discount-engine/
 ├── internal/
 │   ├── discounts/
 │   ├── models/
-│   ├── service/
-│   └── testdata/
+│   └── service/
 │
+├── testdata/
 ├── tests/
 │
 ├── go.mod
@@ -74,19 +74,19 @@ Input:
 - T-shirt category discount: 10%
 - ICICI bank offer: 10%
 
-Flow:
+Flow (brand and category discounts are each computed on base price; bank applies on the running total):
 
 ```text
 1000
-→ 40% brand discount = 600
-→ 10% category discount = 540
-→ 10% bank discount = 486
+→ 40% brand discount on base (−400) = 600
+→ 10% category discount on base (−100) = 500
+→ 10% ICICI bank discount on total (−50) = 450
 ```
 
 Final Price:
 
 ```text
-₹486
+₹450
 ```
 
 ---
@@ -110,7 +110,7 @@ This makes the system extensible and allows new discount types to be added easil
 
 ## Sequential Discount Application
 
-Discounts are intentionally applied sequentially on the running total instead of independently on the original amount.
+Rules run in order: brand → category → voucher → bank. Brand and category discounts are each calculated as a percentage of the item’s **base price**, then subtracted from the running cart total. Voucher and bank discounts apply as a percentage of the **current** total after prior steps.
 
 ---
 
@@ -164,8 +164,9 @@ Rules:
 # Assumptions
 
 - One happy path implementation is sufficient
-- Discounts stack sequentially
-- Voucher applicability is intentionally simplified
+- Brand and category discounts use base price; voucher and bank use the running total
+- Invalid voucher codes passed at checkout return an error (not silently ignored)
+- `CalculateCartDiscounts` matches the assignment interface; `CalculateCartDiscountsWithVoucher` is an extension on `FullDiscountService`
 - No database or persistence layer required
 - Only core pricing/business logic is modeled
 

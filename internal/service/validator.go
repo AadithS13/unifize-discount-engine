@@ -7,7 +7,7 @@ import (
 	"github.com/aadiths/unifize-discount-engine/internal/models"
 )
 
-func (s *DiscountService) ValidateDiscountCode(
+func (s *discountService) ValidateDiscountCode(
 	ctx context.Context,
 	code string,
 	cartItems []models.CartItem,

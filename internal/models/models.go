@@ -18,6 +18,7 @@ type Brand string
 
 const (
 	BrandPuma Brand = "PUMA"
+	BrandNike Brand = "NIKE"
 )
 
 type Category string
@@ -82,7 +83,7 @@ type CustomerProfile struct {
 func ValidateProduct(product Product) error {
 
 	switch product.Brand {
-	case BrandPuma:
+	case BrandPuma, BrandNike:
 	default:
 		return fmt.Errorf("invalid brand: %s", product.Brand)
 	}
